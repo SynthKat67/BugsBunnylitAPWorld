@@ -1,0 +1,5 @@
+name: Player
+game: Bugs Bunny Lost in Time
+Bugs Bunny Lost in Time:
+  goal: present_day
+  death_link: false
