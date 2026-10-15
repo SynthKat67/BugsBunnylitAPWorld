@@ -2,6 +2,7 @@ from BaseClasses import Region
 from .Locations import PS1Location, location_name_to_id
 
 
+
 def create_regions(world):
     player = world.player
     
@@ -13,7 +14,7 @@ def create_regions(world):
     thirties = Region("1930's", player, world.multiworld)
     dimension_x = Region("Dimension X", player, world.multiworld)
     present_day_ending = Region("Present Day Ending", player, world.multiworld)
-    pismo_beach_ending = Region("Pismo Beach Ending", player, world.multiworld)
+    present_day_ending.add_event("Game Complete")
 
     wabbit_on_run = Region("Wabbit on the Run!", player, world.multiworld)
     who_needs_kickstart = Region("Guess Who Needs a Kick Start", player, world.multiworld)
@@ -60,7 +61,6 @@ def create_regions(world):
         thirties,
         dimension_x,
         present_day_ending,
-        pismo_beach_ending,
 
         wabbit_on_run,
         who_needs_kickstart,
@@ -106,14 +106,12 @@ def create_regions(world):
     nowhere.connect(thirties, "1930's")
     nowhere.connect(dimension_x, "Dimension X")
     nowhere.connect(present_day_ending, "Present Day Ending")
-    nowhere.connect(pismo_beach_ending, "Pismo Beach Ending")
 
     
     REGION_PREFIXES = {
 
     
     "Nowhere": nowhere,
-    
     "Wabbit on the Run!": wabbit_on_run,
     "Guess Who Needs a Kick Start": who_needs_kickstart,
     "Magic Hare Blower": magic_hare_blower,
@@ -168,10 +166,10 @@ def create_regions(world):
     medieval.connect(albuquerque, "Witch Way to Albuquerque?")
     medieval.connect(carrothenge, "the Carrot-Henge Mystery")
     medieval.connect(medieval_gc_purchase, "Medieval Period: Golden Carrot Purchase")
-    medieval.connect(magic_sj, "Magic: Super Jump")
-    medieval.connect(magic_mt, "Magic: Magical Tune")
-    medieval.connect(magic_mf, "Magic: Magical Fan")
-    medieval.connect(magic_mp, "Magic: Magical Password")
+    whats_cooking_doc.connect(magic_sj, "Magic: Super Jump")
+    albuquerque.connect(magic_mt, "Magic: Magical Tune")
+    carrothenge.connect(magic_mf, "Magic: Magical Fan")
+    carrothenge.connect(magic_mp, "Magic: Magical Password")
 
     thirties.connect(big_bank, "the Big Bank Withdrawal")
     thirties.connect(objects_in_mirror, "Objects in the Mirror Are Closer Than They Appear!")
@@ -186,8 +184,7 @@ def create_regions(world):
     dimension_x.connect(vort_x_room, "Vort X Room")
     dimension_x.connect(dimension_x_gc_purchase, "Dimension X: Golden Carrot Purchase")
 
-
-
+    print("LOCATION TABLE COUNT:", len(location_name_to_id))
     for name, id in location_name_to_id.items():
             for prefix, region in REGION_PREFIXES.items():
                 if name.startswith(prefix):

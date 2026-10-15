@@ -78,9 +78,96 @@ MAGIC_RULES = {
     "the Greatest Escape: Golden Carrot - 14": ["Magic: Super Jump"],
     "the Greatest Escape: Golden Carrot - 13": ["Magic: Super Jump", "Magic: Magical Tune"],
 
+    "the Planet X File!: Clock - 14": ["Magic: Super Jump"],
+    "the Planet X File!: Clock - 13": ["Magic: Super Jump"],
+    "the Planet X File!: Clock - 12": ["Magic: Super Jump"],
+    "the Planet X File!: Clock - 11": ["Magic: Super Jump"],
+    "the Planet X File!: Clock - 10": ["Magic: Super Jump"],
+
+    "the Planet X File!: Golden Carrot - 26": ["Magic: Super Jump"],
+    "the Planet X File!: Golden Carrot - 25": ["Magic: Super Jump"],
     }
 
+VANILLA_ENTRANCE_RULES = {
+    
+        "Wabbit on the Run!": lambda state, p: state.has("Clock", p, 1),
+        "Guess Who Needs a Kick Start": lambda state, p: state.has("Clock", p, 3),
+        "Wabbit or Duck Season?":lambda state, p: state.has("Golden Carrot", p, 50) and state.has("Clock", p, 1),
+        "Magic Hare Blower": lambda state, p: state.has("Clock", p, 80),
+    
+        "Hey... What's Up, Dock?": lambda state, p: state.has("Clock", p, 5),
+        "When Sam Met Bunny": lambda state, p: state.has("Clock", p, 35),
+        "Mine or Mine?": lambda state, p: state.has("Clock", p, 100),
+        "Follow the Red Pirate Road": lambda state, p: state.has("Clock", p, 11),
+        "Pirate Years: Golden Carrot Purchase":lambda state, p: state.has("Clock", p, 1),
+    
+        "What's Cookin' Doc?": lambda state, p: state.has("Clock", p, 30),
+        "Witch Way to Albuquerque?": lambda state, p: state.has("Clock", p, 65),
+        "the Carrot-Henge Mystery": lambda state, p: state.has("Clock", p, 73),
+        "Downhill Duck!": lambda state, p: state.has("Golden Carrot", p, 250) and state.has("Clock", p, 30),
+        "Medieval Period: Golden Carrot Purchase":lambda state, p: state.has("Clock", p, 1),
+    
+        "the Big Bank Withdrawal": lambda state, p: state.has("Clock", p, 15),
+        "the Greatest Escape": lambda state, p: state.has("Clock", p, 25),
+        "Objects in the Mirror Are Closer Than They Appear!": lambda state, p: state.has("Clock", p, 50),
+        "the Carrot Factory": lambda state, p: state.has("Clock", p, 90),
+        "La Corrida": lambda state, p: state.has("Golden Carrot", p, 150) and state.has("Clock", p, 15),
+        "1930's: Golden Carrot Purchase":lambda state, p: state.has("Clock", p, 1),
+    
+        "the Planet X File!": lambda state, p: state.has("Clock", p, 40),
+        "Vort X Room": lambda state, p: state.has("Clock", p, 60),
+        "the Conquest for Planet X!": lambda state, p: state.has("Clock", p, 70),
+        "Train Your Brain!": lambda state, p: state.has("Clock", p, 117),
+        "Dimension X: Golden Carrot Purchase":lambda state, p: state.has("Clock", p, 1),
+       
+    }
+
+def requirement_rule(requirements, player):
+
+    def rule(state):
+
+        for requirement in requirements:
+
+            if requirement.item == "Clock":
+
+                if not state.has(
+                    "Clock",
+                    player,
+                    requirement.amount,
+                ):
+                    return False
+
+            elif requirement.item == "Golden Carrot":
+
+                if not state.has(
+                    "Golden Carrot",
+                    player,
+                    requirement.amount,
+                ):
+                    return False
+
+            else:
+
+                if not state.has(
+                    requirement.item,
+                    player,
+                ):
+                    return False
+
+        return True
+
+    return rule
+
 def set_rules(world):
+    
+    print("=== SET RULES ===")
+    print(f"level_requirements = {world.level_requirements!r}")
+    print(f"count = {len(world.level_requirements)}")
+
+
+    # ------------------------------------------------------------
+    # Magic-gated locations
+    # ------------------------------------------------------------
 
     for location, requirements in MAGIC_RULES.items():
         set_rule(
@@ -88,76 +175,73 @@ def set_rules(world):
             lambda state, req=requirements: all(
                 state.has(item, world.player)
                 for item in req
+            )
         )
-    )
 
-    ENTRANCE_RULES = {
+    # ------------------------------------------------------------
+    # Level entrance rules
+    # ------------------------------------------------------------
 
-    "Stone Age": lambda state, p: state.has("Clock", p, 1),
-    "Pirate Years": lambda state, p: state.has("Clock", p, 5),
-    "1930's": lambda state, p: state.has("Clock", p, 15),
-    "Medieval Period": lambda state, p: state.has("Clock", p, 30),
-    "Dimension X": lambda state, p: state.has("Clock", p, 40),
-    "Present Day Ending": lambda state, p: state.has("Clock", p, 120),
-    "Pismo Beach Ending": lambda state, p:
-    state.has("Clock", p, 124)
-    and state.has("Golden Carrot", p, 333)
-    and state.has("Magic: Super Jump", p)
-    and state.has("Magic: Magical Tune", p)
-    and state.has("Magic: Magical Fan", p)
-    and state.has("Magic: Magical Password", p),
+    if world.level_requirements:
 
-    "Wabbit on the Run!": lambda state, p: state.has("Clock", p, 1),
-    "Guess Who Needs a Kick Start": lambda state, p: state.has("Clock", p, 3),
-    "Wabbit or Duck Season?":lambda state, p: state.has("Golden Carrot", p, 50) and state.has("Clock", p, 1),
-    "Magic Hare Blower": lambda state, p: state.has("Clock", p, 80),
-    "Stone Age: Golden Carrot Purchase":lambda state, p: state.has("Clock", p, 1),
+        print("=== SHUFFLED LEVEL REQUIREMENTS ===")
 
-    "Hey... What's Up, Dock?": lambda state, p: state.has("Clock", p, 5),
-    "When Sam Met Bunny": lambda state, p: state.has("Clock", p, 35),
-    "Mine or Mine?": lambda state, p: state.has("Clock", p, 100),
-    "Follow the Red Pirate Road": lambda state, p: state.has("Clock", p, 11) and state.has("Magic: Super Jump", p),
-    "Pirate Years: Golden Carrot Purchase":lambda state, p: state.has("Clock", p, 5),
+        for level_name, requirements in world.level_requirements.items():
 
-    "What's Cookin' Doc?": lambda state, p: state.has("Clock", p, 30),
-    "Witch Way to Albuquerque?": lambda state, p: state.has("Clock", p, 65),
-    "the Carrot-Henge Mystery": lambda state, p: state.has("Clock", p, 73),
-    "Downhill Duck!": lambda state, p: state.has("Golden Carrot", p, 250) and state.has("Clock", p, 30),
-    "Medieval Period: Golden Carrot Purchase":lambda state, p: state.has("Clock", p, 30),
-    "Magic: Super Jump":lambda state, p: state.has("Clock", p, 30),
-    "Magic: Magical Tune":lambda state, p: state.has("Clock", p, 65),
-    "Magic: Magical Fan":lambda state, p: state.has("Clock", p, 73),
-    "Magic: Magical Password":lambda state, p: state.has("Clock", p, 73),
+            print(
+                f"{level_name} -> {requirements}"
+            )
 
+            set_rule(
+                world.get_entrance(level_name),
+                requirement_rule(
+                    requirements,
+                    world.player,
+                ),
+            )
 
-    "the Big Bank Withdrawal": lambda state, p: state.has("Clock", p, 15),
-    "the Greatest Escape": lambda state, p: state.has("Clock", p, 25),
-    "Objects in the Mirror Are Closer Than They Appear!": lambda state, p: state.has("Clock", p, 50),
-    "the Carrot Factory": lambda state, p: state.has("Clock", p, 90),
-    "La Corrida": lambda state, p: state.has("Golden Carrot", p, 150) and state.has("Clock", p, 15),
-    "1930's: Golden Carrot Purchase":lambda state, p: state.has("Clock", p, 15),
+            rule = requirement_rule(
+                requirements,
+                world.player,
+            )
 
-    "the Planet X File!": lambda state, p: state.has("Clock", p, 40),
-    "Vort X Room": lambda state, p: state.has("Clock", p, 60),
-    "the Conquest for Planet X!": lambda state, p: state.has("Clock", p, 70),
-    "Train Your Brain!": lambda state, p: state.has("Clock", p, 117),
-    "Dimension X: Golden Carrot Purchase":lambda state, p: state.has("Clock", p, 40),
-   
+    else:
+
+        print("=== VANILLA LEVEL REQUIREMENTS ===")
+
+        for entrance, rule in VANILLA_ENTRANCE_RULES.items():
+
+            print(repr(entrance))
+
+            set_rule(
+                world.get_entrance(entrance),
+                lambda state, r=rule: r(
+                    state,
+                    world.player,
+                ),
+            )
+
+    # Rules for things that are NOT level requirements
+    OTHER_ENTRANCE_RULES = {
+        # put only genuinely independent rules here
+        "Present Day Ending":
+        lambda state, p: state.has("Clock", p, 120),
+
     }
 
-    print("=== Registered Entrances ===")
-    for region in world.multiworld.regions:
-        for exit in region.exits:
-            print(repr(exit.name))
-
-    print("=== Rule Entrances ===")
-    for entrance in ENTRANCE_RULES:
-        print(repr(entrance))
-
-
-    for entrance, rule in ENTRANCE_RULES.items():
+    for entrance, rule in OTHER_ENTRANCE_RULES.items():
         set_rule(
-        world.get_entrance(entrance),
-        lambda state, r=rule: r(state, world.player)
-    )
+            world.get_entrance(entrance),
+            lambda state, r=rule: r(state, world.player)
+        )
 
+        ending = world.get_entrance("Present Day Ending")
+
+    set_rule(
+        ending,
+        lambda state: state.has(
+            "Clock",
+            world.player,
+            120,
+        ),
+    )

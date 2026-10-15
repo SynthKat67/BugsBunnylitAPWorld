@@ -1,6 +1,19 @@
 from typing import Dict, NamedTuple
 from BaseClasses import Location
+
 BASE_LOCATION_ID = 742000
+
+PLAYER_X_ADDRESS = 0x0BB580
+PLAYER_Y_ADDRESS = 0x0BB588
+
+GATE_Y_MIN = 8260
+GATE_Y_MAX = 9450
+
+WITCH_WAY_X_MIN = 6839
+WITCH_WAY_X_MAX = 8060
+
+CARROT_HENGE_X_MIN = 10440
+CARROT_HENGE_X_MAX = 11640
 
 class CounterGroup(NamedTuple):
     address: int
@@ -10,8 +23,39 @@ class FlagGroup(NamedTuple):
     address: int
     flag: int
 
+class LevelRequirement(NamedTuple):
+    item: str
+    amount: int = 1
+
+class CoordinateGate(NamedTuple):
+    x_min: int
+    x_max: int
+    y_min: int
+    y_max: int
+
+class ConditionalEntry(NamedTuple):
+    address: int
+    open_value: int
+    closed_value: int
+    gate: CoordinateGate
+
+class LevelEntry(NamedTuple):
+    entries: tuple
+    requirements: tuple[LevelRequirement, ...]
+    persistent_entries: tuple
+    closed_entries: tuple
+    conditional_entries: tuple[ConditionalEntry, ...] = ()
+    protected_values: tuple = ()
+
 class PS1Location(Location):
     game = "Bugs Bunny Lost in Time"
+
+
+class MagicLocation:
+    def __init__(self, address, value, region):
+        self.address = address
+        self.value = value
+        self.region = region
 
 magic_flags = {
     "Magic: Super Jump":FlagGroup(0x010048, 0x08),
@@ -19,6 +63,32 @@ magic_flags = {
     "Magic: Magical Fan":FlagGroup(0x010048, 0x01),
     "Magic: Magical Password":FlagGroup(0x010048, 0x10),
 }
+
+magic_locations = {
+            "Magic: Super Jump": MagicLocation(
+                address=0x069450,
+                value=0x17,
+                region=0x0D,
+                ),
+
+            "Magic: Magical Tune":MagicLocation(
+                address=0x069450,
+                value=0x0F,
+                region=0x10,
+                ),
+
+            "Magic: Magical Fan":MagicLocation(
+                address=0x069450, 
+                value=0x77,
+                region=0x11,
+                ),
+
+            "Magic: Magical Password":MagicLocation(
+                address=0x069450,
+                value=0xCF,
+                region=0x12,
+                ),
+        }
 
 
 HubCarrots = {
@@ -108,15 +178,336 @@ counter_groups = {
     "Vort X Room: Clock":CounterGroup(0X0100CC, 4),
     }
 
+level_entries = {
+
+    "Wabbit on the Run!": LevelEntry(
+        entries=(
+            (0x0C3AF0, 0xC614),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 1),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0C3AF0, 0xC694),
+        ),
+    ),
+
+    "Guess Who Needs a Kick Start": LevelEntry(
+        entries=(
+            (0x0C3CE4, 0xCB48),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 3),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0C3CE4, 0xCBC8),
+        ),
+    ),
+
+    "Magic Hare Blower": LevelEntry(
+        entries=(
+            (0x0C3ED8, 0xD160),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 80),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0C3ED8, 0xD1E0),
+        ),
+    ),
+
+    "Wabbit or Duck Season?": LevelEntry(
+        entries=(
+            (0x0C4A90, 0xD9DC),
+        ),
+        requirements=(
+            LevelRequirement("Golden Carrot", 50),
+            LevelRequirement("Clock", 1),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0C4A90, 0xDA5C),
+        ),
+    ),
+
+    "Mine or Mine?": LevelEntry(
+        entries=(
+            (0x0B5860, 0x05A4),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 100),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0B5860, 0x0624),
+        ),
+    ),
+
+    "Follow the Red Pirate Road": LevelEntry(
+        entries=(
+            (0x0B5A54, 0x0BE0),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 11),
+            LevelRequirement("Magic: Super Jump"),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0B5A54, 0x0C80),
+        ),
+    ),
+
+    "Hey... What's Up, Dock?": LevelEntry(
+        entries=(
+            (0x0B5478, 0xF950),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 5),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0B5478, 0xF9F0),
+        ),
+    ),
+
+    "When Sam Met Bunny": LevelEntry(
+        entries=(
+            (0x0B566C, 0xFF8C),
+            (0x0B566E, 0x800F),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 35),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0B566C, 0x000C),
+            (0x0B566E, 0x8010),
+        ),
+    ),
+
+    "What's Cookin' Doc?": LevelEntry(
+        entries=(
+            (0x0B2D68, 0xD928),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 30),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0B2D68, 0xD9A8),
+        ),
+    ),
+
+    "Witch Way to Albuquerque?": LevelEntry(
+        entries=(
+            (0x0B2F5C, 0xDF40),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 65),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0B2F5C, 0xDFC0),
+        ),
+        conditional_entries=(
+            ConditionalEntry(
+                address=0x0B3D08,
+                open_value=0xEE48,
+                closed_value=0xEE08,
+                gate=CoordinateGate(
+                    x_min=WITCH_WAY_X_MIN,
+                    x_max=WITCH_WAY_X_MAX,
+                    y_min=GATE_Y_MIN,
+                    y_max=GATE_Y_MAX,
+                ),
+            ),
+        ),
+    ),
+
+    "the Carrot-Henge Mystery": LevelEntry(
+        entries=(
+            (0x0B3150, 0xE57C),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 73),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0B3150, 0xE5FC),
+        ),
+        conditional_entries=(
+            ConditionalEntry(
+                address=0x0B3920,
+                open_value=0xECC8,
+                closed_value=0xEC88,
+                gate=CoordinateGate(
+                    x_min=CARROT_HENGE_X_MIN,
+                    x_max=CARROT_HENGE_X_MAX,
+                    y_min=GATE_Y_MIN,
+                    y_max=GATE_Y_MAX,
+                ),
+            ),
+        ),
+    ),
+
+    "Downhill Duck!": LevelEntry(
+        entries=(
+            (0x0B44D8, 0xF0EC),
+        ),
+        requirements=(
+            LevelRequirement("Golden Carrot", 250),
+            LevelRequirement("Clock", 30),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0B44D8, 0xF16C),
+        ),
+    ),
+
+    "the Big Bank Withdrawal": LevelEntry(
+        entries=(
+            (0x0B7D7C, 0x2A6C),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 15),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+             (0x0B7D7C, 0x2ACC),
+        ),
+    ),
+
+    "the Greatest Escape": LevelEntry(
+        entries=(
+            (0x0B7B88, 0x2430),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 25),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0B7B88, 0x24B0),
+        ),
+    ),
+
+    "Objects in the Mirror Are Closer Than They Appear!": LevelEntry(
+        entries=(
+            (0x0B8358, 0x2ED4),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 50),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0B8358, 0x2F54),
+        ),
+    ),
+
+    "the Carrot Factory": LevelEntry(
+        entries=(
+            (0x0B7994, 0x1D50),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 90),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0B7994, 0x1E10),
+        ),
+    ),
+
+    "La Corrida": LevelEntry(
+        entries=(
+            (0x0BA48C, 0x3CA8),
+        ),
+        requirements=(
+            LevelRequirement("Golden Carrot", 150),
+            LevelRequirement("Clock", 15),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0BA48C, 0x3D28),
+        ),
+    ),
+
+    "Vort X Room": LevelEntry(
+        entries=(
+            (0x0C0A1C, 0xBF78),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 60),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0C0A1C, 0xBF58),
+        ),
+    ),
+
+    "Train Your Brain!": LevelEntry(
+        entries=(
+            (0x0BFC70, 0xAA94),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 117),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0BFC70, 0xAB14),
+        ),
+        protected_values=(
+            (0x0BFC70, 0xAB74),
+        ),
+    ),
+
+    "the Conquest for Planet X!": LevelEntry(
+        entries=(
+            (0x0BFE64, 0xB2DC),
+            (0x0C024C, 0xB7C4),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 70),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0BFE64, 0xB39C),
+            (0x0C024C, 0xB7A4),
+        ),
+        protected_values=(
+            (0x0C024C, 0xB31C),
+            (0x0C024C, 0xB2FC),
+            (0x0C024C, 0xB37C),
+            (0x0C024C, 0xB35C),
+            (0x0C024C, 0xB7C4),
+        ),
+    ),
+
+    "the Planet X File!": LevelEntry(
+        entries=(
+            (0x0BFA7C, 0xA22C),
+        ),
+        requirements=(
+            LevelRequirement("Clock", 40),
+        ),
+        persistent_entries=(),
+        closed_entries=(
+            (0x0BFA7C, 0xA2AC),
+        ),
+        protected_values=(
+            (0x0BFA7C, 0xA32C),
+        ),
+    ),
+}
 
 
 
+location_name_to_id: Dict[str, int] = {}
 
-       
-location_name_to_id:Dict[str, int] ={}
 current_id = BASE_LOCATION_ID + 1
 
-for name in magic_flags:
+for name in magic_locations:
     location_name_to_id[name] = current_id
     current_id += 1
 
